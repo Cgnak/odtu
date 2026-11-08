@@ -1,0 +1,8 @@
+pano.json
+*.plain.json
+test.enc.json
+__pycache__/
+ac.bat
+serve.py
+icons/odtu.ico
+designs/
