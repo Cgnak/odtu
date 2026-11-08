@@ -1,6 +1,6 @@
 // Offline support: the app shell is cached; the encrypted data is fetched fresh when online
 // and the last copy is used when offline. Bump VERSION when app files change.
-const VERSION = 'odtu-v2';
+const VERSION = 'odtu-v3';
 const SHELL = ['./', 'index.html', 'app.css', 'app.js', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {

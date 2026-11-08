@@ -108,7 +108,7 @@ function nextClass() {
   for (let i = 1; i <= 7; i++) { const d = addDays(t, i); const l = classesOn(d).filter(attends); if (l.length) return { c: l[0], state: 'later', date: d, mins: null }; }
   return null;
 }
-const recentFeed = (hours) => (D.feed || []).filter((r) => r.course !== 'Genel' && (now() - new Date(r.at)) / 36e5 <= hours);
+const recentFeed = (hours) => (D.feed || []).filter((r) => (r.course !== 'Genel' || r.important) && (now() - new Date(r.at)) / 36e5 <= hours);
 const unseenCount = () => recentFeed(72).filter((r) => !SEEN.has(msgId(r))).length;
 const meals = (d) => (D.menu || []).filter((m) => m.date === d && m.meal !== 'Kahvaltı');
 const photo = (dish) => (D.food_photos || {})[dish] || '';
@@ -220,7 +220,8 @@ function messageItem(r) {
     ontoggle: (e) => { if (e.target.open && !SEEN.has(id)) { SEEN.add(id); store.set('odtu-seen', [...SEEN].slice(-800)); e.target.querySelector('.new')?.remove(); } },
   },
   h('summary', h('span.t', r.title, fresh ? h('span.new', 'Yeni') : null),
-    h('span.m', courseTag(r.course), h('span', fmt(new Date(r.at), { day: 'numeric', month: 'short' }) + ' ' + new Date(r.at).toTimeString().slice(0, 5)), h('span', r.kind === 'Duyuru' ? 'ODTÜClass duyurusu' : 'Mail'), r.from ? h('span', r.from) : null)),
+    h('span.m', courseTag(r.course), h('span', fmt(new Date(r.at), { day: 'numeric', month: 'short' }) + ' ' + new Date(r.at).toTimeString().slice(0, 5)), h('span', r.kind === 'Duyuru' ? 'ODTÜClass duyurusu' : r.kind === 'Mail' ? 'Mail' : r.kind), r.from && r.from !== r.kind ? h('span', r.from) : null),
+    /^https?:/.test(r.source || '') ? h('a.small', { href: r.source, target: '_blank', rel: 'noopener', onclick: (e) => e.stopPropagation() }, 'Kaynağı aç ↗') : null),
   h('p', r.text || '')));
 }
 
@@ -388,7 +389,7 @@ function Course(c, tab) {
 
 // ---------------------------------------------------------------- Gelen
 function Inbox() {
-  const opts = [['', 'Hepsi'], ...ORDER.map((c) => [c, cname(c)]), ['Genel', 'ODTÜ geneli']];
+  const opts = [['', 'Hepsi'], ...ORDER.map((c) => [c, cname(c)]), ['Genel', 'ODTÜ / bölüm']];
   const box = h('div');
   const draw = () => {
     const q = lower(ui.q);
